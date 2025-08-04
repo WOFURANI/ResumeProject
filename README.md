@@ -3,10 +3,11 @@
 
 
 
- #presenation :\
+ # Presenation :
 
  https://www.canva.com/design/DAGvH7qM3w0/a-buVk4c_drqPTDZ-7ttlw/edit?utm_content=DAGvH7qM3w0&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
 
 
- #streamlitShare:\
+ # StreamlitShare:
  https://resumeproject-fciwcku3ds5k7uudkygpcv.streamlit.app/
+
