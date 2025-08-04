@@ -9,5 +9,4 @@
 
 
  # StreamlitShare:
- https://resumeproject-fciwcku3ds5k7uudkygpcv.streamlit.app/
-
+https://nykuuorexmcjympt8hwmzy.streamlit.app/
