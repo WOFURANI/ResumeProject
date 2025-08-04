@@ -7,7 +7,10 @@ import pdfplumber
 import subprocess
 import importlib.util
 # Load SpaCy model
-nlp = spacy.load("en_core_web_sm")
+try:
+    nlp = spacy.load("custom_ner_model")  # Try custom model
+except:
+    nlp = spacy.load("en_core_web_sm")
 
 # Keywords
 skills = ["javascript", "react", "docker", "laravel", "typescript", "python", "java", "css"]
