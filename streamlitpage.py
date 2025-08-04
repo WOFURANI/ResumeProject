@@ -4,7 +4,8 @@ import re
 import pandas as pd
 from io import StringIO
 import pdfplumber
-
+import subprocess
+import importlib.util
 # Load SpaCy model
 nlp = spacy.load("en_core_web_sm")
 
@@ -62,7 +63,13 @@ def extract_info(text):
 
     return data
 
+def load_spacy_model(model_name="en_core_web_sm"):
+    if importlib.util.find_spec(model_name) is None:
+        subprocess.run(["python", "-m", "spacy", "download", model_name])
+    return spacy.load(model_name)
 
+# Load the model
+nlp = load_spacy_model()
 # ----------------------------
 # Streamlit UI
 # ----------------------------
