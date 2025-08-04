@@ -8,29 +8,32 @@ import nltk
 import sqlite3
 from PIL import Image
 from spacy.training import Example
-from spacy.scorer import Scorer
-from collections import defaultdict
 
+# Download NLTK resources
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 nltk.download('maxent_ne_chunker')
 nltk.download('words')
 
-nlp = spacy.load("custom_ner_model")
+# Load your trained or default spaCy model
+try:
+    nlp = spacy.load("custom_ner_model")  # Try custom model
+except:
+    nlp = spacy.load("en_core_web_sm")    # Fallback to default
 
-# Define keyword lists
+# Skill, education, experience keyword lists
 SKILL_KEYWORDS = ['python', 'java', 'c++', 'sql', 'javascript', 'react', 'node', 'machine learning', 'nlp', 'data analysis']
 DEGREE_KEYWORDS = ['bachelor', 'master', 'phd', 'b.sc', 'm.sc', 'b.e', 'b.tech', 'mba']
 UNIVERSITY_KEYWORDS = ['university', 'institute', 'college', 'school']
 EXPERIENCE_KEYWORDS = ['engineer', 'developer', 'manager', 'intern', 'consultant', 'designer', 'analyst']
 
-# Text extraction
-
+# OCR from image
 def extract_text_from_image(image_path):
     image = Image.open(image_path)
     gray = cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_BGR2GRAY)
     return pytesseract.image_to_string(gray)
 
+# Extract text from PDF using PyMuPDF
 def extract_text_from_pdf(pdf_path):
     text = ""
     doc = fitz.open(pdf_path)
@@ -38,6 +41,7 @@ def extract_text_from_pdf(pdf_path):
         text += page.get_text()
     return text
 
+# Universal extractor
 def extract_text(file_path):
     ext = os.path.splitext(file_path)[-1].lower()
     if ext == ".pdf":
@@ -47,19 +51,21 @@ def extract_text(file_path):
     else:
         raise ValueError("Unsupported file type")
 
-# Info extraction
-
+# Clean lines
 def preprocess_text(text):
     return [line.strip() for line in text.split('\n') if line.strip()]
 
+# Extract email
 def extract_email(text):
     match = re.search(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+", text)
     return match.group() if match else None
 
+# Extract phone
 def extract_phone(text):
     match = re.search(r"\+?\d[\d\s\-()]{8,}\d", text)
     return match.group() if match else None
 
+# Extract name from NER or fallback to NLTK
 def extract_name(text):
     doc = nlp(text)
     for ent in doc.ents:
@@ -78,15 +84,19 @@ def extract_name_nltk(text):
                 return ' '.join(c[0] for c in chunk)
     return None
 
+# Extract skills from keywords
 def extract_skills(text):
     return list({skill for skill in SKILL_KEYWORDS if re.search(rf'\b{re.escape(skill)}\b', text.lower())})
 
+# Check line if education
 def is_education(line):
     return any(deg in line.lower() for deg in DEGREE_KEYWORDS + UNIVERSITY_KEYWORDS)
 
+# Check line if experience
 def is_experience(line):
     return any(role in line.lower() for role in EXPERIENCE_KEYWORDS)
 
+# Extract experience and education with optional date ranges
 def extract_edu_and_exp_with_dates(lines):
     education, experience = [], []
     for line in lines:
@@ -98,8 +108,7 @@ def extract_edu_and_exp_with_dates(lines):
             experience.append({"text": line, "date": date_str})
     return education, experience
 
-# Database
-
+# Store data into SQLite
 def store_in_database(data, db_path="resumes.db"):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -121,10 +130,15 @@ def store_in_database(data, db_path="resumes.db"):
     conn.commit()
     conn.close()
 
-# Main
+# Main logic
 if __name__ == "__main__":
-    resume_file = "resume.pdf"  # path to file
-    text = extract_text(resume_file)
+    file_path = 'resume.pdf'
+
+    if not os.path.exists(file_path):
+        print("File not found.")
+        exit()
+
+    text = extract_text(file_path)
     lines = preprocess_text(text)
 
     parsed = {
@@ -137,9 +151,10 @@ if __name__ == "__main__":
     }
 
     parsed["Education"], parsed["Experience"] = extract_edu_and_exp_with_dates(lines)
-    print("\n✅ Extracted Data:")
+
+    print("Extracted Resume Data:")
     for k, v in parsed.items():
         print(f"{k}: {v}")
 
     store_in_database(parsed)
-    print("\n📁 Stored in database: resumes.db")
+    print("Data stored successfully in 'resumes.db'")
