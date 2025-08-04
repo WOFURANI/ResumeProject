@@ -15,20 +15,13 @@ experience_keywords = ["engineer", "developer", "intern", "manager", "consultant
 education_keywords = ["university", "institute", "college", "school", "education", "bachelor", "master", "phd"]
 
 # Load SpaCy model (with fallback download)
-def load_spacy_model(custom_model_path="custom_ner_model", fallback_model="en_core_web_sm"):
+def load_spacy_model(custom_model_path="custom_ner_model"):
     # Check if custom model directory exists
     if os.path.isdir(custom_model_path):
         try:
             return spacy.load(custom_model_path)
         except Exception as e:
             st.warning(f" Failed to load custom model. Reason: {e}")
-
-    # Fallback to default spaCy model
-    try:
-        return spacy.load(fallback_model)
-    except OSError:
-        subprocess.run(["python", "-m", "spacy", "download", fallback_model])
-        return spacy.load(fallback_model)
 
 # Load model
 nlp = load_spacy_model()
