@@ -18,9 +18,11 @@
   },
   "labels":{
     "ner":[
-      "DATE",
-      "ORG",
-      "PERSON",
+      "EDUCATION",
+      "EMAIL",
+      "EXPERIENCE",
+      "Name",
+      "PHONE",
       "SKILL"
     ]
   },
