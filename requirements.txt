@@ -15,6 +15,7 @@ python-docx==1.1.0
 streamlit==1.33.0
 matplotlib==3.8.2
 seaborn==0.13.2
+spacy==3.7.2
 
 # Model Training / Evaluation
 spacy-transformers==1.3.4
